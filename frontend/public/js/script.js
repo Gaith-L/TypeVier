@@ -31,6 +31,18 @@ function highlightWords() {
     document.getElementById('wordsContainer').innerHTML = highlighted;
 }
 
+document.getElementById("startRaceButton").addEventListener("click", startRace);
+
+function startRace() {
+    let content = document.getElementById('wordsContainer');
+    console.log("Started race!")
+    wordsArray.forEach(word => {
+        console.log(word)
+        content.innerHTML += `<span>${word} </span>`
+    });
+
+}
+
 document.getElementById('counterButton').addEventListener('click', function() {
     count++;
     document.getElementById('countDisplay').innerText = 'Count: ' + count;
