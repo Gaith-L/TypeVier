@@ -12,7 +12,7 @@ import (
 func main() {
 	fmt.Println("------------- Application start -------------")
 
-	const hostName string = "localhost:8000"
+	const hostName string = "localhost:8080"
 
 	handlers.RegisterAndTrackHandler("/", handlers.RootHandler)
 	handlers.RegisterAndTrackHandler("/time", handlers.TimeHandler)
