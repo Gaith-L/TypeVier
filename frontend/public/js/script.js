@@ -1,27 +1,36 @@
 let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
-
+// let words = "This sentence if for testing."
 const wordsArray = words.split(" ")
+const wordsArrayLength = wordsArray.length
 const htmlWordsContainer = document.getElementById('wordsContainer').textContent
 
 let htmlWords = htmlWordsContainer.split(' ')
 
 let wordsIndex = 0;
 
+let wordsContainer = document.getElementById('wordsContainer');
+
+let input = document.getElementById('wordsInput')
+
+let checkWordInputIntervalId
+
 function checkWordInput() {
-    var input = document.getElementById('wordsInput')
+    let wordSpans = wordsContainer.querySelectorAll('.word-span')
+    wordSpans.forEach(span => {
+        span.style.color = ''
+    })
 
-    console.log(wordsArray[wordsIndex])
-
+    if (wordsIndex >= wordsArrayLength) {
+        clearInterval(checkWordInputIntervalId); // Stop the interval once wordsIndex exceeds array length
+        return;
+    }
+    wordSpans[wordsIndex].style.color = 'yellow'
     if (input.value === wordsArray[wordsIndex] + " ") {
         input.value = ""
-        // if (wordsIndex > 0) {
-        //     console.log(wordsArray[wordsIndex - 1])
-        // }
         console.log(wordsArray[wordsIndex])
         wordsIndex++
     }
 }
-setInterval(checkWordInput, 100)
 
 function highlightWords() {
     const input = document.getElementById('wordsInput').value;
@@ -34,13 +43,14 @@ function highlightWords() {
 document.getElementById("startRaceButton").addEventListener("click", startRace);
 
 function startRace() {
-    let content = document.getElementById('wordsContainer');
     console.log("Started race!")
-    wordsArray.forEach(word => {
-        console.log(word)
-        content.innerHTML += `<span>${word} </span>`
+    wordsArray.forEach((word, idx) => {
+        // console.log(word)
+        wordsContainer.innerHTML += `<span class="word-span" id="word-span-id-${idx}">${word} </span>`
     });
-
+    input.focus();
+    input.value = ''
+    checkWordInputIntervalId = setInterval(checkWordInput, 10) // TODO: improve this by adding a listener on 'space'
 }
 
 document.getElementById('counterButton').addEventListener('click', function() {
