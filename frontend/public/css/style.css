@@ -1,4 +1,88 @@
+/* Reset default margins and set a clean base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: black;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+}
+
+#wordsContainer {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    min-height: 100px;
+    line-height: 1.8;
+    font-size: 1.2rem;
+}
+
+#wordsInput {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+#wordsInput:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+#startRaceButton {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    background-color: #007bff;
     color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#startRaceButton:hover {
+    background-color: #0056b3;
+}
+
+#resultContainer {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    body {
+        padding: 1rem;
+    }
+    
+    #wordsContainer {
+        padding: 1rem;
+    }
+    
+    #startRaceButton {
+        width: 100%;
+    }
 }
