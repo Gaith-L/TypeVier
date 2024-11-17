@@ -21,10 +21,14 @@ let timerSeconds = 0
 
 function checkWordInput() {
     startTimer()
-    console.log(timerSeconds + ":" + timerTens)
+    // console.log(timerSeconds + ":" + timerTens)
     let wordSpans = wordsContainer.querySelectorAll('.word-span')
-    wordSpans.forEach(span => {
-        span.style.color = ''
+    wordSpans.forEach((span, index) => {
+        if (index < wordsIndex) {
+            span.style.color = 'green'
+        } else if (index > wordsIndex) {
+            span.style.color = ''
+        }
     })
 
     if (wordsIndex >= wordsArrayLength) {
@@ -32,9 +36,11 @@ function checkWordInput() {
         typingTestRunning = false
         wordsIndex = 0
         resultContainer.innerHTML = (wordsArrayLength / ((timerSeconds + 1 / timerTens) / 60)).toFixed(0)
+        timerTens = 0
+        timerSeconds = 0
         return;
     }
-    wordSpans[wordsIndex].style.color = 'yellow'
+    wordSpans[wordsIndex].style.color = 'blue'
     if (input.value === wordsArray[wordsIndex] + " ") {
         input.value = ""
         wordsIndex++
