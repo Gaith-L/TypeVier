@@ -89,7 +89,7 @@ class TypeRacer {
 
         this.handleCheating = () => {
             // Reset progress or implement other anti-cheat measures
-            metrics.currentIndex = 0
+            metrics.currentWordIndex = 0
             metrics.typedWords = []
             metrics.startTime = null
             metrics.mistakes = 0
@@ -109,7 +109,7 @@ function onPageLoad() {
     const wordsContainer = document.getElementById('wordsContainer')
     wordsContainer.innerHTML = ''
     game.getWords().forEach((word, idx) => {
-        wordsContainer.innerHTML += `<span class="word-span" id="word-span-id-${idx}">${word} </span>`
+        wordsContainer.innerHTML += `<span class="word-span" id="word-span-id-${idx}">${word}</span>`
     })
     updateUI(game.getProgress(), game.getCurrentWord(), game.getWPM())
     input.focus()
@@ -151,7 +151,7 @@ function updateUI(progress, currentWord, wpm) {
             span.style.color = ''
             span.style.background = ''
         } else {
-            span.style.background = 'gray'
+            span.style.background = 'rgb(233, 240, 53)'
         }
     })
 

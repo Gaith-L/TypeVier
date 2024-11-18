@@ -20,6 +20,10 @@ h1 {
     margin-bottom: 2rem;
 }
 
+.word-span {
+  margin-right: 5px; /* Adjust the value as needed */
+}
+
 #wordsContainer {
     background-color: white;
     padding: 2rem;
