@@ -25,15 +25,20 @@ h1 {
 }
 
 #wordsContainer {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem;
-    min-height: 100px;
-    line-height: 1.8;
-    font-size: 1.2rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  min-height: 100px;
+  line-height: 1.8;
+  font-size: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;  /* Ensures content wraps when it overflows horizontally */
+  gap: 7px;        /* Adds spacing between words */
 }
+
+
 
 #wordsInput {
     width: 100%;
