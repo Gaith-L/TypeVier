@@ -107,8 +107,8 @@ class TypeRacer {
     }
 }
 
-// let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
-let words = "a sentence for testing the program."
+let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
+// let words = "a sentence for testing the program."
 
 const game = new TypeRacer(words)
 
@@ -135,8 +135,11 @@ function handleTyping(event) {
 
     if (event.key === ' ' || event.key === 'Enter') {
         if (game.checkWord(typedWord)) {
+            event.preventDefault();
+
             updateUI(game.getProgress(), game.getCurrentWord(), game.getWPM())
         }
+        // TODO: update UI to handle mistakes
     }
 }
 
@@ -162,6 +165,7 @@ function updateUI(progress, currentWord, wpm) {
             span.style.color = ''
             span.style.background = ''
         } else {
+            span.style.color = ''
             span.style.background = 'rgb(233, 240, 53)'
         }
     })
