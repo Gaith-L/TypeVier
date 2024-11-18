@@ -97,6 +97,13 @@ class TypeRacer {
             // emit an event or call a callback
         }
 
+        this.restartRace = () => {
+            state.gameStarted = false
+            metrics.startTime = null
+            metrics.currentWordIndex = 0
+            metrics.typedWords = []
+            updateUI(game.getProgress(), game.getCurrentWord(), game.getWPM())
+        }
     }
 }
 
@@ -105,6 +112,10 @@ let words = "a sentence for testing the program."
 
 const game = new TypeRacer(words)
 
+const button = document.getElementById('startRaceButton');
+
+// Add an event listener to handle the click event
+button.addEventListener('click', game.restartRace)
 function onPageLoad() {
     const wordsContainer = document.getElementById('wordsContainer')
     wordsContainer.innerHTML = ''
@@ -157,5 +168,6 @@ function updateUI(progress, currentWord, wpm) {
 
     wpmContainer.innerHTML = "WPM: " + wpm
     currentWordContainer.innerHTML = "Current word: " + currentWord
-    input.value = '';
+    input.value = ''
+    input.focus()
 }
