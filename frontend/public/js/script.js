@@ -1,81 +1,161 @@
-let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
-// let words = "This sentence if for testing."
+class TypeRacer {
+    constructor(text) {
+        Object.defineProperty(this, '_words', {
+            value: Object.freeze(text.split(' ')),
+            writable: false,
+            configurable: false,
+        })
 
-const wordsArray = words.split(" ")
-const wordsArrayLength = wordsArray.length
+        const state = {
+            gameStarted: false,
+        }
 
-const htmlWordsContainer = document.getElementById('wordsContainer').textContent
-let htmlWords = htmlWordsContainer.split(' ')
+        this.getState = () => state
+        this.setState = () => {
+            if (!state.gameStarted) {
+                state.gameStarted = true
+                this.setStartTime()
+            }
+        }
 
-let wordsIndex = 0;
+        const metrics = {
+            startTime: null,
+            typedWords: [],
+            currentWordIndex: 0,
+            mistakes: 0
+        }
 
-const wordsContainer = document.getElementById('wordsContainer')
+        let lastKeyPressTime = Date.now()
+        const minTimeBetweenKeysMs = 30
+
+        this.getProgress = () => ({
+            wordsTyped: metrics.currentWordIndex,
+            totalWords: this._words.length,
+            mistakes: metrics.mistakes,
+            isComplete: metrics.currentWordIndex === this._words.length
+        })
+
+        this.getCurrentWord = () => {
+            if ((metrics.currentWordIndex + 1) <= this._words.length) {
+                return this._words[metrics.currentWordIndex]
+            } else {
+                return ''
+            }
+        }
+        this.getWords = () => this._words
+
+
+        this.setStartTime = () => {
+            metrics.startTime = Date.now()
+        }
+
+        this.checkWord = (typedWord) => {
+            const currentTime = Date.now()
+            const timeDiff = currentTime - lastKeyPressTime
+
+            if (timeDiff < minTimeBetweenKeysMs) {
+                this.handleCheating()
+                return false
+            }
+
+            lastKeyPressTime = currentTime // TODO: (fix) not checking for individual key presses yet
+
+            if (!metrics.startTime && metrics.currentWordIndex === 0) {
+                metrics.startTime = Date.now()
+            }
+
+            if (typedWord === this.getCurrentWord()) {
+                metrics.typedWords.push({
+                    word: typedWord,
+                    timestamp: Date.now()
+                })
+                metrics.currentWordIndex++
+                return true
+            } else {
+                metrics.mistakes++
+                return false
+            }
+        }
+
+        this.getWPM = () => {
+            if (!metrics.startTime || metrics.typedWords.length === 0) return 0
+
+            const timeElapsed = (Date.now() - metrics.startTime) / 1000 / 60 // in minutes
+            const wordCount = metrics.typedWords.length
+
+            // Calculate WPM based on actual timestamps of typed words
+            return Math.round(wordCount / timeElapsed)
+        }
+
+        this.handleCheating = () => {
+            // Reset progress or implement other anti-cheat measures
+            metrics.currentIndex = 0
+            metrics.typedWords = []
+            metrics.startTime = null
+            metrics.mistakes = 0
+            console.log("abnormality detected")
+            // emit an event or call a callback
+        }
+
+    }
+}
+
+// let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
+let words = "a sentence for testing the program."
+
+const game = new TypeRacer(words)
+
+function onPageLoad() {
+    const wordsContainer = document.getElementById('wordsContainer')
+    wordsContainer.innerHTML = ''
+    game.getWords().forEach((word, idx) => {
+        wordsContainer.innerHTML += `<span class="word-span" id="word-span-id-${idx}">${word} </span>`
+    })
+    updateUI(game.getProgress(), game.getCurrentWord(), game.getWPM())
+    input.focus()
+}
+
+window.onload = onPageLoad
+
+function handleTyping(event) {
+    game.setState()
+
+    const typedWord = event.target.value.trim()
+
+    if (event.key === ' ' || event.key === 'Enter') {
+        if (game.checkWord(typedWord)) {
+            updateUI(game.getProgress(), game.getCurrentWord(), game.getWPM())
+        }
+    }
+}
+
 const input = document.getElementById('wordsInput')
-const resultContainer = document.getElementById('resultContainer')
+input.addEventListener('keydown', handleTyping)
 
-let checkWordInputIntervalId
-let typingTestRunning = false
-
-let timerTens = 0
-let timerSeconds = 0
-
-function checkWordInput() {
-    startTimer()
-    // console.log(timerSeconds + ":" + timerTens)
+function updateUI(progress, currentWord, wpm) {
     let wordSpans = wordsContainer.querySelectorAll('.word-span')
+    let wpmContainer = document.getElementById('wpmContainer')
+    let currentWordContainer = document.getElementById('currentWordContainer')
+
+    if (game.getState().gameStarted === false) {
+        wordSpans[0].style.background = 'gray'
+    } else {
+        wordSpans[0].style.background = ''
+    }
+
     wordSpans.forEach((span, index) => {
-        if (index < wordsIndex) {
+        if (index < progress.wordsTyped) {
             span.style.color = 'green'
-        } else if (index > wordsIndex) {
+            span.style.background = ''
+        } else if (index > progress.wordsTyped) {
             span.style.color = ''
+            span.style.background = ''
+        } else {
+            span.style.background = 'gray'
         }
     })
 
-    if (wordsIndex >= wordsArrayLength) {
-        clearInterval(checkWordInputIntervalId); // Stop the interval once wordsIndex exceeds array length
-        typingTestRunning = false
-        wordsIndex = 0
-        resultContainer.innerHTML = (wordsArrayLength / ((timerSeconds + 1 / timerTens) / 60)).toFixed(0)
-        timerTens = 0
-        timerSeconds = 0
-        return;
-    }
-    wordSpans[wordsIndex].style.color = 'blue'
-    if (input.value === wordsArray[wordsIndex] + " ") {
-        input.value = ""
-        wordsIndex++
-    }
-}
-
-function highlightWords() {
-    const input = document.getElementById('wordsInput').value;
-    const content = document.getElementById('wordsContainer').innerHTML;
-    const regex = new RegExp(`(${input})`, 'gi');
-    const highlighted = content.replace(regex, '<span class="highlight">$1</span>');
-    document.getElementById('wordsContainer').innerHTML = highlighted;
-}
-
-document.getElementById("startRaceButton").addEventListener("click", startRace);
-
-function startRace() {
-    if (typingTestRunning == false) {
-        wordsContainer.innerHTML = ""
-        wordsArray.forEach((word, idx) => {
-            wordsContainer.innerHTML += `<span class="word-span" id="word-span-id-${idx}">${word} </span>`
-        });
-
-        input.value = ''
-        checkWordInputIntervalId = setInterval(checkWordInput, 10) // TODO: improve this by adding a listener on 'space'
-    }
-    input.focus();
-    typingTestRunning = true
-}
-
-function startTimer() {
-    timerTens++
-
-    if (timerTens > 99) {
-        timerSeconds++
-        timerTens = 0
-    }
+    wpmContainer.innerHTML = "WPM: " + wpm
+    currentWordContainer.innerHTML = "Current word: " + currentWord
+    input.value = '';
 }
