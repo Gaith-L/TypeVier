@@ -11,7 +11,7 @@ body {
     padding: 2rem;
     max-width: 800px;
     margin: 0 auto;
-    background-color: #f5f5f5;
+    background-color: #000000;
 }
 
 h1 {
@@ -86,12 +86,39 @@ h1 {
     body {
         padding: 1rem;
     }
-    
+
     #wordsContainer {
         padding: 1rem;
     }
-    
+
     #startRaceButton {
         width: 100%;
     }
+}
+
+.word {
+    display: inline-block;
+    /* margin-right: 10px; */
+    margin-right: 0px;
+}
+.letter {
+    display: inline-block;
+    position: relative;
+}
+.caret {
+    position: absolute;
+    width: 2px;
+    height: 1em;
+    background: black;
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+    from, to { visibility: hidden; }
+    50% { visibility: visible; }
+}
+.correct {
+    color: green;
+}
+.incorrect {
+    color: red;
 }
