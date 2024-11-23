@@ -11,7 +11,7 @@ import (
 
 func main() {
 	fmt.Println("------------- Application start -------------")
-
+	
 	const hostName string = "localhost:8080"
 
 	handlers.RegisterAndTrackHandler("/", handlers.RootHandler)
