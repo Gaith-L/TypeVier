@@ -167,7 +167,11 @@ class TypeRacer {
 }
 
 window.onload = onPageLoad
+window.onresize = onResize
 
+function onResize() {
+    game.updateCaret()
+}
 
 function onPageLoad() {
     let wordsContainer = document.getElementById('wordsContainer')
@@ -186,7 +190,7 @@ function onPageLoad() {
 
         wordsContainer.appendChild(wordDiv)
     })
-    game.updateCaret(wordDivs)
+    game.updateCaret()
     wordDivs[0].classList.add("active")
     // wordDivs[0].querySelectorAll('span')[0].style.backgroundColor = 'yellow'
 }
