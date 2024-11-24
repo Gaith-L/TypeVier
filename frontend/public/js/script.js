@@ -50,30 +50,72 @@ class TypeRacer {
         this.startTimer = () => state.startTime = Date.now()
         this.endTimer = () => state.endTime = Date.now()
 
-        this.checkLetter = (event, words) => {
+        this.checkLetter = (event) => {
+            let wordsContainer = document.getElementById('wordsContainer')
+            let words = wordsContainer.children
+
             const expectedCurrentWord = words[state.currentWordIndex]
             const lettersInCurrentWord = expectedCurrentWord.querySelectorAll('.letter')
+
+            // if (state.currentLetterIndex === 0 && !expectedCurrentWord.classList.contains("active")) {
+            //     expectedCurrentWord.classList.add("active")
+            // }
 
             if (event.key === 'Backspace') {
                 event.preventDefault()
 
                 if (state.currentLetterIndex > 0) {
-                    state.currentLetterIndex--
-                    lettersInCurrentWord[state.currentLetterIndex].classList.remove("correct", "incorrect")
+                    if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('extra')) {
+                        lettersInCurrentWord[state.currentLetterIndex - 1].remove()
+                        state.currentLetterIndex--
+                    } else {
+                        state.currentLetterIndex--
+                        lettersInCurrentWord[state.currentLetterIndex].classList.remove("correct", "incorrect")
+                    }
                 } else if (state.currentWordIndex > 0) {
+                    words[state.currentWordIndex].classList.remove("active")
+
+                    // Go back to previous word and change class list
                     state.currentWordIndex--
-                    state.currentLetterIndex = words[state.currentWordIndex].querySelectorAll('.letter').length - 1
-                    words[state.currentWordIndex].querySelectorAll('.letter')[state.currentLetterIndex].classList.remove("correct", "incorrect")
+                    state.currentLetterIndex = words[state.currentWordIndex].querySelectorAll('.letter').length
+
+                    words[state.currentWordIndex].classList.remove("typed")
+                    if (words[state.currentWordIndex].classList.contains("correct")) {
+                        words[state.currentWordIndex].classList.remove("correct")
+                    } else if (words[state.currentWordIndex].classList.contains("incorrect")) {
+                        words[state.currentWordIndex].classList.remove("incorrect")
+                    }
+                    words[state.currentWordIndex].classList.add("active")
                 }
             } else if (event.key === ' ') {
                 event.preventDefault()
                 if (state.currentLetterIndex === lettersInCurrentWord.length) {
+                    // Remove "active" from current typed word
+
+                    let hasIncorrectLetter = false
+                    lettersInCurrentWord.forEach(letter => {
+                        if (letter.classList.contains('incorrect')) {
+                            hasIncorrectLetter = true
+                        }
+                    })
+
+                    if (hasIncorrectLetter) {
+                        words[state.currentWordIndex].classList.remove("active")
+                        words[state.currentWordIndex].classList.add("incorrect")
+                        words[state.currentWordIndex].classList.add("typed")
+                    } else {
+                        words[state.currentWordIndex].classList.remove("active")
+                        words[state.currentWordIndex].classList.add("correct")
+                        words[state.currentWordIndex].classList.add("typed")
+                    }
+
                     state.currentWordIndex++
                     state.currentLetterIndex = 0
+
+                    // Set next word to "active"
+                    words[state.currentWordIndex].classList.add("active")
                 }
             } else if (event.key.length === 1) {
-                console.log(state.currentLetterIndex);
-                console.log(lettersInCurrentWord.length);
                 if (state.currentLetterIndex < lettersInCurrentWord.length) {
                     if (event.key === lettersInCurrentWord[state.currentLetterIndex].textContent) {
                         lettersInCurrentWord[state.currentLetterIndex].classList.add('correct')
@@ -81,12 +123,41 @@ class TypeRacer {
                         lettersInCurrentWord[state.currentLetterIndex].classList.add('incorrect')
                     }
                     state.currentLetterIndex++
-                } else {
+                    console.log("hit");
+                } else if (state.currentLetterIndex === lettersInCurrentWord.length) {
+                    const extraKeySpan = document.createElement('span')
+                    extraKeySpan.classList.add("letter")
+                    extraKeySpan.classList.add("incorrect")
+                    extraKeySpan.classList.add("extra")
+                    extraKeySpan.textContent = event.key
+                    words[state.currentWordIndex].appendChild(extraKeySpan)
+                    state.currentLetterIndex++
+                    words[state.currentWordIndex].offsetHeight;
+
+                    console.log("typed extra");
 
                 }
-            } else if (state.currentLetterIndex === lettersInCurrentWord.length) {
-                state.currentWordIndex++
-                state.currentLetterIndex = 0
+            }
+
+            console.log(lettersInCurrentWord);
+            console.log(state.currentLetterIndex);
+        }
+
+        this.updateCaret = () => {
+            let wordsContainer = document.getElementById('wordsContainer')
+            let words = wordsContainer.children
+
+            const currentWord = words[state.currentWordIndex]
+            const letters = currentWord.querySelectorAll(".letter")
+
+            if (state.currentLetterIndex < letters.length) {
+                const currentLetter = letters[state.currentLetterIndex]
+                caret.style.top = currentLetter.getBoundingClientRect().top + 5 + "px"
+                caret.style.left = currentLetter.getBoundingClientRect().left + "px"
+            } else {
+                const lastLetter = letters[letters.length - 1]
+                caret.style.top = lastLetter.getBoundingClientRect().top + 5 + "px"
+                caret.style.left = (lastLetter.getBoundingClientRect().left + lastLetter.offsetWidth) + "px"
             }
         }
 
@@ -97,10 +168,11 @@ class TypeRacer {
 
 window.onload = onPageLoad
 
-let wordsContainer = document.getElementById('wordsContainer')
-let wordDivs = wordsContainer.children
 
 function onPageLoad() {
+    let wordsContainer = document.getElementById('wordsContainer')
+    let wordDivs = wordsContainer.children
+
     game.getWordsVisual().forEach(word => {
         const wordDiv = document.createElement('div')
         wordDiv.classList.add('word');
@@ -114,8 +186,9 @@ function onPageLoad() {
 
         wordsContainer.appendChild(wordDiv)
     })
-
-    wordDivs[0].querySelectorAll('span')[0].style.backgroundColor = 'yellow'
+    game.updateCaret(wordDivs)
+    wordDivs[0].classList.add("active")
+    // wordDivs[0].querySelectorAll('span')[0].style.backgroundColor = 'yellow'
 }
 
 input = document.getElementById('wordsInput')
@@ -130,7 +203,8 @@ function keyPressHandler(event) {
         return
     }
 
-    const out = game.checkLetter(event, wordDivs)
+    game.checkLetter(event)
+    game.updateCaret()
 
     input.value = ''
 }
@@ -141,3 +215,4 @@ const game = new TypeRacer(words)
 
 const caret = document.createElement("div");
 caret.classList.add("caret");
+document.body.appendChild(caret)

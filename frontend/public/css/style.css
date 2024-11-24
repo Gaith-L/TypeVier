@@ -11,7 +11,7 @@ body {
     padding: 2rem;
     max-width: 800px;
     margin: 0 auto;
-    background-color: #000000;
+    background-color: #ffffff;
 }
 
 h1 {
@@ -37,7 +37,6 @@ h1 {
   flex-wrap: wrap;  /* Ensures content wraps when it overflows horizontally */
   gap: 7px;        /* Adds spacing between words */
 }
-
 
 
 #wordsInput {
@@ -108,8 +107,8 @@ h1 {
 .caret {
     position: absolute;
     width: 2px;
-    height: 1em;
-    background: black;
+    height: 1.5em;
+    background: rgb(0, 0, 0);
     animation: blink 1s step-end infinite;
 }
 @keyframes blink {
