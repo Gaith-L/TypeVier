@@ -12,9 +12,7 @@ class TypeRacer {
             configurable: false,
         })
 
-
         const state = {
-
             startTime: null,
             endTime: null,
             keyHistory: [], // includes both correct and incorrect key input
@@ -56,10 +54,6 @@ class TypeRacer {
 
             const expectedCurrentWord = words[state.currentWordIndex]
             const lettersInCurrentWord = expectedCurrentWord.querySelectorAll('.letter')
-
-            // if (state.currentLetterIndex === 0 && !expectedCurrentWord.classList.contains("active")) {
-            //     expectedCurrentWord.classList.add("active")
-            // }
 
             if (event.key === 'Backspace') {
                 event.preventDefault()
@@ -123,7 +117,6 @@ class TypeRacer {
                         lettersInCurrentWord[state.currentLetterIndex].classList.add('incorrect')
                     }
                     state.currentLetterIndex++
-                    console.log("hit");
                 } else if (state.currentLetterIndex === lettersInCurrentWord.length) {
                     const extraKeySpan = document.createElement('span')
                     extraKeySpan.classList.add("letter")
@@ -133,14 +126,8 @@ class TypeRacer {
                     words[state.currentWordIndex].appendChild(extraKeySpan)
                     state.currentLetterIndex++
                     words[state.currentWordIndex].offsetHeight;
-
-                    console.log("typed extra");
-
                 }
             }
-
-            console.log(lettersInCurrentWord);
-            console.log(state.currentLetterIndex);
         }
 
         this.updateCaret = () => {
@@ -169,6 +156,9 @@ class TypeRacer {
 window.onload = onPageLoad
 window.onresize = onResize
 
+input = document.getElementById('wordsInput')
+input.addEventListener('keydown', keyPressHandler)
+
 function onResize() {
     game.updateCaret()
 }
@@ -192,11 +182,11 @@ function onPageLoad() {
     })
     game.updateCaret()
     wordDivs[0].classList.add("active")
-    // wordDivs[0].querySelectorAll('span')[0].style.backgroundColor = 'yellow'
+
+    input.value = ''
+    input.focus()
 }
 
-input = document.getElementById('wordsInput')
-input.addEventListener('keydown', keyPressHandler)
 
 function keyPressHandler(event) {
     const isLetter = event.key.length === 1
