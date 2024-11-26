@@ -40,13 +40,13 @@ h1 {
 
 
 #wordsInput {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
-    border: 2px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    transition: border-color 0.3s ease;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
 }
 
 #wordsInput:focus {
@@ -110,6 +110,7 @@ h1 {
     height: 1.5em;
     background: rgb(0, 0, 0);
     /* animation: blink 1s step-end infinite; */
+    /* transition: top 0.1s ease, left 0.1s ease; */
 }
 @keyframes blink {
     from, to { visibility: hidden; }
@@ -120,4 +121,8 @@ h1 {
 }
 .incorrect {
     color: red;
+}
+
+.hidden {
+    display: none;
 }
