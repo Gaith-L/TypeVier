@@ -19,12 +19,9 @@ class TypeRacer {
             wordHistory: [],
             keyMistakes: [], // a key mistake is a single wrong input (e: 'h', i: 'j')
             wordMistakes: [], // a word mistake is when a wrong input is typed and space is clicked to 'submit' (e: 'The', i: 'Teh')
-
             currentTypedWord: '',
-
             currentWordIndex: 0,
             currentLetterIndex: 0,
-
             currentWPM: 0, // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             finalWPM: 0,
             accuracy: 0,
@@ -54,7 +51,6 @@ class TypeRacer {
             if (state.startTime === null) {
                 this.startRace()
             }
-            console.log(state.startTime);
 
             let wordsContainer = document.getElementById('wordsContainer')
             let words = wordsContainer.children
@@ -279,7 +275,6 @@ function keyPressHandler(event) {
     const isCtrlAndBackspace = (event.ctrlKey && event.key === 'Backspace')
 
     if (isLetter || isSpace || isBackspace || isCtrlAndBackspace) {
-        console.log(event);
         game.checkLetter(event)
         game.updateCaret()
     } else if (event.altKey || event.metaKey) {
