@@ -81,7 +81,17 @@ class TypeRacer {
                 // Move to end of previous word
                 state.currentWordIndex--;
                 const previousWordLetters = words[state.currentWordIndex].querySelectorAll('.letter');
-                state.currentLetterIndex = previousWordLetters.length;
+
+                if (previousWordLetters[previousWordLetters.length - 1].classList.contains('correct') || previousWordLetters[previousWordLetters.length - 1].classList.contains('incorrect')) {
+                    state.currentLetterIndex = previousWordLetters.length
+                } else {
+                    for (let i = 1; i < previousWordLetters.length; i++) {
+                        if (!previousWordLetters[i].classList.contains('correct') && !previousWordLetters[i].classList.contains('incorrect') ) {
+                            state.currentLetterIndex = i;
+                            break;
+                        }
+                    }
+                }
 
                 // Reset previous word state
                 resetCurrentWord(words[state.currentWordIndex]);
@@ -100,9 +110,10 @@ class TypeRacer {
         }
 
         const handleSpaceKey = (words, currentWord, lettersInCurrentWord) => {
-            // Only process space if all letters in current word are typed
             if (state.currentLetterIndex === lettersInCurrentWord.length) {
                 completeCurrentWord(words, currentWord, lettersInCurrentWord);
+            } else if (state.currentLetterIndex != 0) {
+                incompleteCurrentWord(words, currentWord, lettersInCurrentWord);
             }
         }
 
@@ -121,6 +132,18 @@ class TypeRacer {
             }
 
             // Move to next word if not the last word
+            if (state.currentWordIndex < state.wordsLength - 1) {
+                state.currentWordIndex++;
+                state.currentLetterIndex = 0;
+                words[state.currentWordIndex].classList.add('active');
+            }
+        }
+
+        const incompleteCurrentWord = (words, currentWord, lettersInCurrentWord) => {
+            currentWord.classList.remove('active');
+
+            currentWord.classList.add('incorrect', 'typed');
+
             if (state.currentWordIndex < state.wordsLength - 1) {
                 state.currentWordIndex++;
                 state.currentLetterIndex = 0;
