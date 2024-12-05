@@ -28,6 +28,10 @@ class TypeRacer {
             currentTypedWord: '',
             currentWordIndex: 0,
             currentLetterIndex: 0,
+            correctCharCount: 0,
+            incorrectCharCount: 0,
+            extraCharCount: 0,
+            // TODO: add missedCharCount?
             currentWPM: 0, // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             finalWPM: 0,
             accuracy: 0,
@@ -43,8 +47,13 @@ class TypeRacer {
                 const lastLetter = lettersInCurrentWord[state.currentLetterIndex - 1];
                 if (lastLetter.classList.contains('extra')) {
                     lastLetter.remove();
-                } else {
-                    lastLetter.classList.remove('correct', 'incorrect');
+                    state.extraCharCount--
+                } else if (lastLetter.classList.contains('correct')) {
+                    lastLetter.classList.remove('correct');
+                    state.correctCharCount--
+                } else if (lastLetter.classList.contains('incorrect')) {
+                    lastLetter.classList.remove('incorrect');
+                    state.incorrectCharCount--
                 }
                 state.currentLetterIndex--;
                 state.keyHistory.pop();
@@ -63,9 +72,15 @@ class TypeRacer {
                     if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('extra')) {
                         lettersInCurrentWord[state.currentLetterIndex - 1].remove();
                         state.currentLetterIndex--;
-                    } else {
+                        state.extraCharCount--;
+                    } else if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('correct')){
                         state.currentLetterIndex--;
-                        lettersInCurrentWord[state.currentLetterIndex].classList.remove('correct', 'incorrect');
+                        lettersInCurrentWord[state.currentLetterIndex].classList.remove('correct');
+                        state.correctCharCount--;
+                    } else if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('incorrect')) {
+                        state.currentLetterIndex--;
+                        lettersInCurrentWord[state.currentLetterIndex].classList.remove('incorrect');
+                        state.incorrectCharCount--;
                     }
                 }
             } else if (state.currentWordIndex > 0) {
@@ -148,6 +163,8 @@ class TypeRacer {
                 state.currentWordIndex++;
                 state.currentLetterIndex = 0;
                 words[state.currentWordIndex].classList.add('active');
+            } else if (state.currentWordIndex === state.wordsLength - 1) {
+                endRace()
             }
         }
 
@@ -162,9 +179,11 @@ class TypeRacer {
 
                 if (event.key === expectedLetter.textContent) {
                     expectedLetter.classList.add('correct');
+                    state.correctCharCount++;
                 } else {
                     expectedLetter.classList.add('incorrect');
                     state.keyMistakes.push(event.key);
+                    state.incorrectCharCount++
                 }
                 state.currentLetterIndex++;
             } else if (state.currentLetterIndex > 19) {
@@ -175,6 +194,8 @@ class TypeRacer {
                 extraKeySpan.textContent = event.key;
                 currentWord.appendChild(extraKeySpan);
                 state.currentLetterIndex++;
+
+                state.extraCharCount++
             }
 
             // Check if race is completed (last word and fully typed)
@@ -201,6 +222,9 @@ class TypeRacer {
             state.currentTypedWord = ''
             state.currentWordIndex = 0
             state.currentLetterIndex = 0
+            state.correctCharCount = 0
+            state.incorrectCharCount = 0
+            state.extraCharCount = 0
             state.currentWPM = 0 // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             state.finalWPM = 0
             state.accuracy = 0
@@ -215,9 +239,14 @@ class TypeRacer {
         const calculateRaceMetrics = () => {
             const timeTakenInMinutes = (state.endTime - state.startTime) / 60000;
 
+            // const finalWPM = Math.round(
+            //     (state.currentWordIndex + 1) / timeTakenInMinutes
+            // );
+
             const finalWPM = Math.round(
-                (state.currentWordIndex + 1) / timeTakenInMinutes
-            );
+                (state.correctCharCount / timeTakenInMinutes) / 5
+            )
+
 
             // Calculate Accuracy
             const totalKeystrokes = state.keyHistory.length;
@@ -273,6 +302,9 @@ class TypeRacer {
             currentTypedWord: state.currentTypedWord,
             currentWordIndex: state.currentWordIndex,
             currentLetterIndex: state.currentLetterIndex,
+            correctCharCount: state.correctCharCount,
+            incorrectCharCount: state.incorrectCharCount,
+            extraCharCount: state.extraCharCount,
             currentWPM: state.currentWPM,
             finalWPM: state.finalWPM,
             accuracy: state.accuracy,
@@ -350,6 +382,9 @@ class TypeRacer {
                 currentTypedWord: '',
                 currentWordIndex: 0,
                 currentLetterIndex: 0,
+                correctCharCount: 0,
+                incorrectCharCount: 0,
+                extraCharCount: 0,
                 currentWPM: 0,
                 finalWPM: 0,
                 accuracy: 0,
