@@ -32,7 +32,6 @@ class TypeRacer {
             incorrectCharCount: 0,
             extraCharCount: 0,
             missedCharCount: 0,
-            // TODO: add missedCharCount?
             currentWPM: 0, // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             finalWPM: 0,
             accuracy: 0,
@@ -104,6 +103,7 @@ class TypeRacer {
                     for (let i = 1; i < previousWordLetters.length; i++) {
                         if (!previousWordLetters[i].classList.contains('correct') && !previousWordLetters[i].classList.contains('incorrect') ) {
                             state.currentLetterIndex = i;
+                            state.missedCharCount -= previousWordLetters.length - i
                             break;
                         }
                     }
@@ -145,6 +145,7 @@ class TypeRacer {
                 state.wordMistakes.push(this._wordsVisual[state.currentWordIndex]);
             } else {
                 currentWord.classList.add('correct', 'typed');
+                state.correctCharCount++;
             }
 
             // Move to next word if not the last word
@@ -215,6 +216,26 @@ class TypeRacer {
             }
         }
 
+        this.resetRace = () => {
+            state.startTime = null
+            state.endTime = null
+            state.keyHistory = []
+            state.wordHistory = []
+            state.keyMistakes = []
+            state.wordMistakes = []
+            state.currentTypedWord = ''
+            state.currentWordIndex = 0
+            state.currentLetterIndex = 0
+            state.correctCharCount = 0
+            state.incorrectCharCount = 0
+            state.extraCharCount = 0
+            state.missedCharCount = 0
+            state.currentWPM = 0 // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
+            state.finalWPM = 0
+            state.accuracy = 0
+            document.getElementById('resultContainer').classList.add('hidden');
+        }
+
         this.startRace = () => {
             state.startTime = Date.now()
             state.endTime = null
@@ -252,12 +273,7 @@ class TypeRacer {
                 (state.correctCharCount / timeTakenInMinutes) / 5
             )
 
-            // Calculate Accuracy
-            const totalKeystrokes = state.keyHistory.length;
-            const incorrectKeystrokes = state.keyMistakes.length;
-            const accuracy = Math.max(0, Math.round(
-                ((totalKeystrokes - incorrectKeystrokes) / totalKeystrokes) * 100
-            ));
+            const accuracy = Math.round((state.correctCharCount / (state.keyHistory.length + state.missedCharCount)) * 100)
 
             state.finalWPM = finalWPM
             state.accuracy = accuracy
@@ -286,19 +302,6 @@ class TypeRacer {
             console.log(`Accuracy: ${state.accuracy}%`);
             console.log(`Total Mistakes: ${state.keyMistakes.length}`);
             console.log(`Word Mistakes: ${state.wordMistakes}`);
-        }
-
-        const resetRace = () => {
-            state = this.createInitialState();
-
-            // Reset visual state of words
-            const wordsContainer = document.getElementById('wordsContainer');
-            if (wordsContainer) {
-                Array.from(wordsContainer.children).forEach(word => {
-                    word.classList.remove('active', 'typed', 'correct', 'incorrect');
-                });
-                wordsContainer.children[0].classList.add('active');
-            }
         }
 
         const shouldProcessKey = (event) => {
@@ -389,29 +392,6 @@ class TypeRacer {
             }
         }
 
-
-        this.createInitialState = () => {
-            return {
-                startTime: null,
-                endTime: null,
-                wordsLength: this.#wordsVisual.length,
-                keyHistory: [],
-                wordHistory: [],
-                keyMistakes: [],
-                wordMistakes: [],
-                currentTypedWord: '',
-                currentWordIndex: 0,
-                currentLetterIndex: 0,
-                correctCharCount: 0,
-                incorrectCharCount: 0,
-                extraCharCount: 0,
-                missedCharCount: 0,
-                currentWPM: 0,
-                finalWPM: 0,
-                accuracy: 0,
-            };
-        }
-
         this.getWordsVisual = () => this._wordsVisual
         this.getWordsInternal = () => this._wordsInternal
     }
@@ -429,19 +409,20 @@ window.addEventListener('resize', () => {
     }, 200); // Adjust the timeout as needed
 });
 
-let wordsContainer = document.getElementById('wordsContainer')
-wordsContainer.addEventListener('click', () => {
-    input.style.pointerEvents = 'all';
-    input.focus();
-});
-
-input = document.getElementById('wordsInput')
+input = document.getElementById('wordsInput');
+let wordsContainer = document.getElementById('wordsContainer');
 
 input.addEventListener('blur', () => {
-    input.style.pointerEvents = 'none';
+    caret.classList.add("hidden")
 });
 
+input.addEventListener('focus', () => {
+    caret.classList.remove("hidden")
+});
 
+wordsContainer.addEventListener('click', () => {
+    input.focus();
+});
 
 function onPageLoad() {
     let wordDivs = wordsContainer.children
@@ -543,7 +524,7 @@ startRaceButton = document.getElementById("startRaceButton")
 startRaceButton.onclick = () => {
     word = generateRandomText(selectedWordCount);
     game = new TypeRacer(word);
-    game.startRace()
+    game.resetRace()
     input.value = ''
     input.focus()
     onPageLoad()

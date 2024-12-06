@@ -102,6 +102,7 @@ h1 {
 .letter {
     display: inline-block;
     position: relative;
+    color: #707070;
 }
 
 .caret {
@@ -116,12 +117,12 @@ h1 {
     50% { visibility: visible; }
 }
 
-.correct {
-    color: #4caf50;
+.letter.correct {
+    color: #ffffff;
 }
 
 .letter.incorrect {
-    color: #f44336;
+    color: #b13c33;
 }
 
 .word-count-selector {
