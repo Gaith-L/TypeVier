@@ -108,7 +108,7 @@ h1 {
     position: absolute;
     width: 2px;
     height: 1.5em;
-    background: #ffffff;
+    background: #007bff;
 }
 
 @keyframes blink {
@@ -124,8 +124,117 @@ h1 {
     color: #f44336;
 }
 
+.word-count-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.word-count-btn {
+    background: #1e1e1e;
+    color: #888;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.word-count-btn:hover {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.word-count-btn.active {
+    background: #333;
+    color: #007bff;
+}
+
+#resultContainer {
+    margin-top: 2rem;
+    padding: 2rem;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+}
+
+.result-grid {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.result-item {
+    text-align: center;
+}
+
+.result-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+}
+
+.result-label {
+    font-size: 1rem;
+    color: #888;
+    text-transform: lowercase;
+}
+
+.result-details {
+    max-width: 400px;
+    margin: 0 auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid #333;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.detail-label {
+    color: #888;
+}
+
+.detail-value {
+    color: #e0e0e0;
+}
+
 .hidden {
     display: none;
+    opacity: 0;
+}
+
+.detail-value[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+.detail-value[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: #fff;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.detail-value[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
 }
 
 .word.incorrect.typed::after {

@@ -31,6 +31,7 @@ class TypeRacer {
             correctCharCount: 0,
             incorrectCharCount: 0,
             extraCharCount: 0,
+            missedCharCount: 0,
             // TODO: add missedCharCount?
             currentWPM: 0, // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             finalWPM: 0,
@@ -156,8 +157,10 @@ class TypeRacer {
 
         const incompleteCurrentWord = (words, currentWord, lettersInCurrentWord) => {
             currentWord.classList.remove('active');
-
             currentWord.classList.add('incorrect', 'typed');
+
+            const missedChars = lettersInCurrentWord.length - state.currentLetterIndex;
+            state.missedCharCount += missedChars;
 
             if (state.currentWordIndex < state.wordsLength - 1) {
                 state.currentWordIndex++;
@@ -225,9 +228,11 @@ class TypeRacer {
             state.correctCharCount = 0
             state.incorrectCharCount = 0
             state.extraCharCount = 0
+            state.missedCharCount = 0
             state.currentWPM = 0 // TODO: probably set a timer event every 1 sec that calls a calcWPM func from TypeRacer obj
             state.finalWPM = 0
             state.accuracy = 0
+            document.getElementById('resultContainer').classList.add('hidden');
         }
 
         const endRace = () => {
@@ -247,7 +252,6 @@ class TypeRacer {
                 (state.correctCharCount / timeTakenInMinutes) / 5
             )
 
-
             // Calculate Accuracy
             const totalKeystrokes = state.keyHistory.length;
             const incorrectKeystrokes = state.keyMistakes.length;
@@ -260,8 +264,24 @@ class TypeRacer {
         }
 
         const displayRaceResults = () => {
+            const resultContainer = document.getElementById('resultContainer');
+            const timeTaken = ((state.endTime - state.startTime) / 1000).toFixed(1);
+
+            // Update result values
+            document.getElementById('wpmResult').textContent = state.finalWPM;
+            document.getElementById('accuracyResult').textContent = state.accuracy + '%';
+            document.getElementById('charactersResult').textContent =
+                `${state.correctCharCount}/${state.incorrectCharCount}/${state.extraCharCount}/${state.missedCharCount}`;
+            document.getElementById('consistencyResult').textContent =
+                Math.round((state.finalWPM / (state.finalWPM + 10)) * 100) + '%';
+            document.getElementById('timeResult').textContent = timeTaken + 's';
+
+            // Show the results container
+            resultContainer.classList.remove('hidden');
+
+            // Log results to console (optional)
             console.log('Race Completed!');
-            console.log(`Time: ${((state.endTime - state.startTime) / 1000).toFixed(2)} seconds`);
+            console.log(`Time: ${timeTaken} seconds`);
             console.log(`Words Per Minute: ${state.finalWPM}`);
             console.log(`Accuracy: ${state.accuracy}%`);
             console.log(`Total Mistakes: ${state.keyMistakes.length}`);
@@ -385,6 +405,7 @@ class TypeRacer {
                 correctCharCount: 0,
                 incorrectCharCount: 0,
                 extraCharCount: 0,
+                missedCharCount: 0,
                 currentWPM: 0,
                 finalWPM: 0,
                 accuracy: 0,
@@ -395,7 +416,6 @@ class TypeRacer {
         this.getWordsInternal = () => this._wordsInternal
     }
 }
-
 
 window.onload = onPageLoad
 let resizeTimeout;
@@ -421,13 +441,7 @@ input.addEventListener('blur', () => {
     input.style.pointerEvents = 'none';
 });
 
-startRaceButton = document.getElementById("startRaceButton")
-startRaceButton.onclick = () => {
-    game.startRace()
-    input.value = ''
-    input.focus()
-    onPageLoad()
-}
+
 
 function onPageLoad() {
     let wordDivs = wordsContainer.children
@@ -468,11 +482,69 @@ function keyPressHandler(event) {
     }
 }
 
-// let words = "The sun dipped below the horizon, casting a warm orange glow across the tranquil lake. Birds chirped their final melodies of the day as the first stars began to twinkle in the twilight sky. A gentle breeze rustled the leaves of the tall trees lining the water's edge, creating a soothing symphony that harmonized with the soft lapping of the waves. In this serene moment, time seemed to stand still, offering a brief escape from the chaos of everyday life It was a perfect reminder of nature's quiet beauty and the peace it could bring to a restless soul."
-let words = "this is for testing the program."
-// let words = "hastily beneath swimming delicious through banana violently eager despite melted carefully purple jumping yesterday within happily smashed above quantum briskly toward laughing sideways beneath furiously eating whenever sleepy beneath dancing smoothly around between loudly sparkling after gently during breakfast inside leaping softly because zigzagging upward while before quickly alongside mellow instantly outside nervously beyond slippery since wobbling together anxiously quietly"
-const game = new TypeRacer(words)
+const commonWords = [
+    'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'it',
+    'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at', 'this',
+    'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she', 'or',
+    'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what',
+    'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me',
+    'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
+    'take', 'people', 'into', 'year', 'your', 'good', 'some', 'could',
+    'them', 'see', 'other', 'than', 'then', 'now', 'look', 'only', 'come',
+    'its', 'over', 'think', 'also', 'back', 'after', 'use', 'two', 'how',
+    'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because',
+    'any', 'these', 'give', 'day', 'most', 'us', 'time', 'person', 'year',
+    'good', 'way', 'about', 'many', 'then', 'them', 'write', 'would', 'like',
+    'so', 'these', 'her', 'long', 'make', 'thing', 'see', 'him', 'two',
+    'has', 'look', 'more', 'day', 'could', 'go', 'come', 'did', 'number',
+    'sound', 'most', 'people', 'over', 'know', 'water', 'than', 'call',
+    'first', 'who', 'may', 'down', 'side', 'been', 'now', 'find', 'head'
+];
+
+function generateRandomText(wordCount = 30) {
+    const selectedWords = [];
+    for (let i = 0; i < wordCount; i++) {
+        const randomIndex = Math.floor(Math.random() * commonWords.length);
+        selectedWords.push(commonWords[randomIndex]);
+    }
+    return selectedWords.join(' ');
+}
+
+const wordCountBtns = document.querySelectorAll('.word-count-btn');
+let selectedWordCount = 10;
+
+let words = generateRandomText(selectedWordCount);
+let game = new TypeRacer(words);
+
+wordCountBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Update active state
+        wordCountBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update selected word count
+        selectedWordCount = parseInt(btn.dataset.count);
+
+        // Generate new text and restart
+        words = generateRandomText(selectedWordCount);
+        game = new TypeRacer(words);
+        game.startRace();
+        input.value = '';
+        input.focus();
+        onPageLoad();
+    });
+});
 
 const caret = document.createElement("div");
 caret.classList.add("caret");
 document.body.appendChild(caret)
+
+startRaceButton = document.getElementById("startRaceButton")
+startRaceButton.onclick = () => {
+    word = generateRandomText(selectedWordCount);
+    game = new TypeRacer(word);
+    game.startRace()
+    input.value = ''
+    input.focus()
+    onPageLoad()
+}

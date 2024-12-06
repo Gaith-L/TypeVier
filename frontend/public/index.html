@@ -1,27 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <script>
+            /*to prevent Firefox FOUC, this must be here*/
+            let FF_FOUC_FIX;
+        </script>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <script>
-        /*to prevent Firefox FOUC, this must be here*/
-        let FF_FOUC_FIX;
-    </script>
-</head>
+    <body>
+        <h1>TypeVier</h1>
+        <div class="word-count-selector">
+            <button class="word-count-btn active" data-count="10">10</button>
+            <button class="word-count-btn" data-count="25">25</button>
+            <button class="word-count-btn" data-count="50">50</button>
+            <button class="word-count-btn" data-count="100">100</button>
+        </div>
+        <div id="wordsContainer"></div>
+        <input type="text" id="wordsInput" />
+        <button id="startRaceButton">Start Race</button>
 
-<body>
-    <h1>TypeVier</h1>
+        <div id="resultContainer" class="hidden">
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-value" id="wpmResult">60</div>
+                    <div class="result-label">wpm</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="accuracyResult">86%</div>
+                    <div class="result-label">acc</div>
+                </div>
+            </div>
+            <div class="result-details">
+                <div class="detail-row">
+                    <span class="detail-label">characters</span>
+                    <span
+                        class="detail-value"
+                        id="charactersResult"
+                        data-tooltip="correct / incorrect / extra / missed"
+                        >62/0/0/0</span
+                    >
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">consistency</span>
+                    <span class="detail-value" id="consistencyResult">68%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">time</span>
+                    <span class="detail-value" id="timeResult">13s</span>
+                </div>
+            </div>
+        </div>
+        <div id="wpmContainer"></div>
+        <div id="currentWordContainer"></div>
 
-    <div id="wordsContainer"></div>
-    <input type="text" id="wordsInput" />
-    <button id="startRaceButton">Start Race</button>
-    <div id="wpmContainer"></div>
-    <div id="currentWordContainer"></div>
-
-    <script src="js/script.js"></script>
-</body>
-
+        <script src="js/script.js"></script>
+    </body>
 </html>
