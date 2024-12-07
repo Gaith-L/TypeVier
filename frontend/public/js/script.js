@@ -21,7 +21,7 @@ class TypeRacer {
             startTime: null,
             endTime: null,
             wordsLength: this._wordsVisual.length,
-            keyHistory: [], // includes both correct and incorrect key input
+            // keyHistory: [], // includes both correct and incorrect key input
             wordHistory: [],
             keyMistakes: [], // a key mistake is a single wrong input (e: 'h', i: 'j')
             wordMistakes: [], // a word mistake is when a wrong input is typed and space is clicked to 'submit' (e: 'The', i: 'Teh')
@@ -39,7 +39,7 @@ class TypeRacer {
 
         const handleBackspace = (event, words, currentWord, lettersInCurrentWord) => {
             if (event.ctrlKey) {
-                handleCtrlBackspace(words, currentWord, lettersInCurrentWord);
+                handleCtrlBackspace(event, words, currentWord, lettersInCurrentWord);
                 return;
             }
 
@@ -56,19 +56,32 @@ class TypeRacer {
                     state.incorrectCharCount--
                 }
                 state.currentLetterIndex--;
-                state.keyHistory.pop();
+                state.keyHistory.push({
+                    key: event.key,
+                    correct: true,
+                    extra: false,
+                    timestamp: Date.now(),
+                })
+
             } else if (state.currentWordIndex > 0) {
                 // Move to previous word if at the start of current word
-                moveBackToPreviousWord(words);
+                moveBackToPreviousWord(event, words);
             }
         }
 
-        const handleCtrlBackspace = (words, currentWord, lettersInCurrentWord) => {
+        const handleCtrlBackspace = (event, words, currentWord, lettersInCurrentWord) => {
             if (state.currentLetterIndex > 0) {
                 resetCurrentWord(currentWord);
 
                 // Reset letter tracking
                 for (let i = state.currentLetterIndex; i > 0; i--) {
+                    state.keyHistory.push({
+                        key: event.key,
+                        correct: true,
+                        extra: false,
+                        timestamp: Date.now()
+                    })
+
                     if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('extra')) {
                         lettersInCurrentWord[state.currentLetterIndex - 1].remove();
                         state.currentLetterIndex--;
@@ -84,11 +97,11 @@ class TypeRacer {
                     }
                 }
             } else if (state.currentWordIndex > 0) {
-                moveBackToPreviousWord(words);
+                moveBackToPreviousWord(event, words);
             }
         }
 
-        const moveBackToPreviousWord = (words) => {
+        const moveBackToPreviousWord = (event, words) => {
             // Only move back if previous word is not typed correctly
             if (canMoveToPreviousWord(words)) {
                 words[state.currentWordIndex].classList.remove('active');
@@ -97,13 +110,31 @@ class TypeRacer {
                 state.currentWordIndex--;
                 const previousWordLetters = words[state.currentWordIndex].querySelectorAll('.letter');
 
+                // Check if previous word has missing chars
                 if (previousWordLetters[previousWordLetters.length - 1].classList.contains('correct') || previousWordLetters[previousWordLetters.length - 1].classList.contains('incorrect')) {
                     state.currentLetterIndex = previousWordLetters.length
+                    state.keyHistory.push({
+                        key: event.key,
+                        correct: true,
+                        extra: false,
+                        timestamp: Date.now(),
+                    })
                 } else {
                     for (let i = 1; i < previousWordLetters.length; i++) {
                         if (!previousWordLetters[i].classList.contains('correct') && !previousWordLetters[i].classList.contains('incorrect') ) {
                             state.currentLetterIndex = i;
                             state.missedCharCount -= previousWordLetters.length - i
+
+                            // push (previousWordLetters.length - i) amount of 'Backspace' key presses
+                            for (let j = 0; j < previousWordLetters.length - i; j++) {
+                                state.keyHistory.push({
+                                    key: event.key,
+                                    correct: true,
+                                    extra: false,
+                                    timestamp: Date.now()
+                                })
+                                console.log("HERE");
+                            }
                             break;
                         }
                     }
@@ -125,15 +156,16 @@ class TypeRacer {
             word.classList.remove('typed', 'correct', 'incorrect');
         }
 
-        const handleSpaceKey = (words, currentWord, lettersInCurrentWord) => {
+        const handleSpaceKey = (event, words, currentWord, lettersInCurrentWord) => {
+            // state.keyHistory.push(event.key);
             if (state.currentLetterIndex === lettersInCurrentWord.length) {
-                completeCurrentWord(words, currentWord, lettersInCurrentWord);
+                completeCurrentWord(event, words, currentWord, lettersInCurrentWord);
             } else if (state.currentLetterIndex != 0) {
-                incompleteCurrentWord(words, currentWord, lettersInCurrentWord);
+                incompleteCurrentWord(event, words, currentWord, lettersInCurrentWord);
             }
         }
 
-        const completeCurrentWord = (words, currentWord, lettersInCurrentWord) => {
+        const completeCurrentWord = (event, words, currentWord, lettersInCurrentWord) => {
             const hasIncorrectLetter = !Array.from(lettersInCurrentWord).every(letter =>
                 letter.classList.contains('correct')
             );
@@ -143,9 +175,23 @@ class TypeRacer {
             if (hasIncorrectLetter) {
                 currentWord.classList.add('incorrect', 'typed');
                 state.wordMistakes.push(this._wordsVisual[state.currentWordIndex]);
+                state.keyHistory.push({
+                    key: event.key,
+                    correct: false,
+                    extra: false,
+                    timestamp: Date.now(),
+                })
             } else {
                 currentWord.classList.add('correct', 'typed');
+                // Account for correct space press
+                state.keyHistory.push({
+                    key: event.key,
+                    correct: true,
+                    extra: false,
+                    timestamp: Date.now(),
+                })
                 state.correctCharCount++;
+
             }
 
             // Move to next word if not the last word
@@ -156,7 +202,13 @@ class TypeRacer {
             }
         }
 
-        const incompleteCurrentWord = (words, currentWord, lettersInCurrentWord) => {
+        const incompleteCurrentWord = (event, words, currentWord, lettersInCurrentWord) => {
+            state.keyHistory.push({
+                key: event.key,
+                correct: false,
+                extra: false,
+                timestamp: Date.now(),
+            })
             currentWord.classList.remove('active');
             currentWord.classList.add('incorrect', 'typed');
 
@@ -175,18 +227,27 @@ class TypeRacer {
         const handleRegularKeyPress = (event, words, currentWord, lettersInCurrentWord) => {
             if (event.key.length !== 1) return;
 
-            // Track key press
-            state.keyHistory.push(event.key);
-
             if (state.currentLetterIndex < lettersInCurrentWord.length) {
                 const expectedLetter = lettersInCurrentWord[state.currentLetterIndex];
 
                 if (event.key === expectedLetter.textContent) {
                     expectedLetter.classList.add('correct');
                     state.correctCharCount++;
+                    state.keyHistory.push({
+                        key: event.key,
+                        correct: true,
+                        extra: false,
+                        timestamp: Date.now(),
+                    })
                 } else {
                     expectedLetter.classList.add('incorrect');
-                    state.keyMistakes.push(event.key);
+                    state.keyHistory.push({
+                        key: event.key,
+                        correct: false,
+                        extra: false,
+                        timestamp: Date.now(),
+                    })
+                    state.keyMistakes.push(event.key); // TODO: is this necessary
                     state.incorrectCharCount++
                 }
                 state.currentLetterIndex++;
@@ -200,18 +261,25 @@ class TypeRacer {
                 state.currentLetterIndex++;
 
                 state.extraCharCount++
+
+                state.keyHistory.push({
+                    key: event.key,
+                    correct: false,
+                    extra: true,
+                    timestamp: Date.now(),
+                })
             }
 
             // Check if race is completed (last word and fully typed)
-            checkRaceCompletion(words, currentWord, lettersInCurrentWord);
+            checkRaceCompletion(event, words, currentWord, lettersInCurrentWord);
         }
 
-        const checkRaceCompletion = (words, currentWord, lettersInCurrentWord) => {
+        const checkRaceCompletion = (event, words, currentWord, lettersInCurrentWord) => {
             if (state.currentWordIndex === state.wordsLength - 1 &&
                 state.currentLetterIndex === lettersInCurrentWord.length &&
                 lettersInCurrentWord[lettersInCurrentWord.length - 1].classList.contains('correct')) {
 
-                completeCurrentWord(words, currentWord, lettersInCurrentWord);
+                completeCurrentWord(event, words, currentWord, lettersInCurrentWord);
                 endRace();
             }
         }
@@ -263,17 +331,31 @@ class TypeRacer {
         }
 
         const calculateRaceMetrics = () => {
-            const timeTakenInMinutes = (state.endTime - state.startTime) / 60000;
+            let totalKeyStrokesExceptBackspace = 0;
+            let correctKeyStrokes = 0;
+            let incorrectKeyStrokes = 0;
 
-            // const finalWPM = Math.round(
-            //     (state.currentWordIndex + 1) / timeTakenInMinutes
-            // );
+            for (let i = 0; i < state.keyHistory.length; i++) {
+                if (state.keyHistory[i].key != 'Backspace') {
+                    totalKeyStrokesExceptBackspace++;
+                } else {
+                    continue;
+                }
+
+                if (state.keyHistory[i].correct === true) {
+                    correctKeyStrokes++;
+                } else if (state.keyHistory[i].correct === false) {
+                    incorrectKeyStrokes++;
+                }
+            }
+
+            const timeTakenInMinutes = (state.endTime - state.startTime) / 60000;
 
             const finalWPM = Math.round(
                 (state.correctCharCount / timeTakenInMinutes) / 5
             )
 
-            const accuracy = Math.round((state.correctCharCount / (state.keyHistory.length + state.missedCharCount)) * 100)
+            const accuracy = Math.round((correctKeyStrokes / (totalKeyStrokesExceptBackspace)) * 100)
 
             state.finalWPM = finalWPM
             state.accuracy = accuracy
@@ -336,6 +418,8 @@ class TypeRacer {
         this.handleKeyDown = (event) => {
             event.preventDefault();
 
+            console.log(state.keyHistory);
+
             // Existing key processing logic
             if (!shouldProcessKey(event)) return;
 
@@ -362,7 +446,7 @@ class TypeRacer {
                     handleBackspace(event, words, currentWord, lettersInCurrentWord);
                     break;
                 case ' ':
-                    handleSpaceKey(words, currentWord, lettersInCurrentWord);
+                    handleSpaceKey(event, words, currentWord, lettersInCurrentWord);
                     break;
                 default:
                     handleRegularKeyPress(event, words, currentWord, lettersInCurrentWord);
