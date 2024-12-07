@@ -133,7 +133,6 @@ class TypeRacer {
                                     extra: false,
                                     timestamp: Date.now()
                                 })
-                                console.log("HERE");
                             }
                             break;
                         }
@@ -247,7 +246,6 @@ class TypeRacer {
                         extra: false,
                         timestamp: Date.now(),
                     })
-                    state.keyMistakes.push(event.key); // TODO: is this necessary
                     state.incorrectCharCount++
                 }
                 state.currentLetterIndex++;
@@ -374,10 +372,8 @@ class TypeRacer {
                 Math.round((state.finalWPM / (state.finalWPM + 10)) * 100) + '%';
             document.getElementById('timeResult').textContent = timeTaken + 's';
 
-            // Show the results container
             resultContainer.classList.remove('hidden');
 
-            // Log results to console (optional)
             console.log('Race Completed!');
             console.log(`Time: ${timeTaken} seconds`);
             console.log(`Words Per Minute: ${state.finalWPM}`);
@@ -387,7 +383,6 @@ class TypeRacer {
         }
 
         const shouldProcessKey = (event) => {
-            // Only process printable characters, backspace, and space
             return event.key.length === 1 ||
                    event.key === 'Backspace' ||
                    event.key === ' ';
@@ -417,8 +412,6 @@ class TypeRacer {
 
         this.handleKeyDown = (event) => {
             event.preventDefault();
-
-            console.log(state.keyHistory);
 
             // Existing key processing logic
             if (!shouldProcessKey(event)) return;
