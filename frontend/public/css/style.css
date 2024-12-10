@@ -32,7 +32,7 @@ h1 {
     margin-bottom: 1.5rem;
     min-height: 100px;
     line-height: 1.8;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
@@ -108,7 +108,7 @@ h1 {
 .caret {
     position: absolute;
     width: 2px;
-    height: 1.5em;
+    height: 1.8em;
     background: #007bff;
 }
 

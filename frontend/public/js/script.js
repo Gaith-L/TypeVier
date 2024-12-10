@@ -86,7 +86,7 @@ class TypeRacer {
                         lettersInCurrentWord[state.currentLetterIndex - 1].remove();
                         state.currentLetterIndex--;
                         state.extraCharCount--;
-                    } else if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('correct')){
+                    } else if (lettersInCurrentWord[state.currentLetterIndex - 1].classList.contains('correct')) {
                         state.currentLetterIndex--;
                         lettersInCurrentWord[state.currentLetterIndex].classList.remove('correct');
                         state.correctCharCount--;
@@ -121,7 +121,7 @@ class TypeRacer {
                     })
                 } else {
                     for (let i = 1; i < previousWordLetters.length; i++) {
-                        if (!previousWordLetters[i].classList.contains('correct') && !previousWordLetters[i].classList.contains('incorrect') ) {
+                        if (!previousWordLetters[i].classList.contains('correct') && !previousWordLetters[i].classList.contains('incorrect')) {
                             state.currentLetterIndex = i;
                             state.missedCharCount -= previousWordLetters.length - i
 
@@ -147,8 +147,8 @@ class TypeRacer {
 
         const canMoveToPreviousWord = (words) => {
             return state.currentWordIndex > 0 &&
-                   !(words[state.currentWordIndex - 1].classList.contains('correct') &&
-                     words[state.currentWordIndex - 1].classList.contains('typed'));
+                !(words[state.currentWordIndex - 1].classList.contains('correct') &&
+                    words[state.currentWordIndex - 1].classList.contains('typed'));
         }
 
         const resetCurrentWord = (word) => {
@@ -384,8 +384,8 @@ class TypeRacer {
 
         const shouldProcessKey = (event) => {
             return event.key.length === 1 ||
-                   event.key === 'Backspace' ||
-                   event.key === ' ';
+                event.key === 'Backspace' ||
+                event.key === ' ';
         }
 
         /*------------------- */
